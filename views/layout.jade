@@ -1,0 +1,34 @@
+include mixins
+
+doctype html
+html( lang='en' )
+  head
+    title= title
+    meta( charset='utf-8' )
+    meta( http-equiv='X-UA-Compatible', content='IE=edge' )
+    meta( name='viewport', content='width=device-width, initial-scale=1.0' )
+    meta( name='description', content=title )
+    //- Bootswatch theme
+    +bootswatch('superhero')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  
+  body
+    .container
+    +nav('Pokemon', 'dropdown_menu')
+        +nav_item('/') Home
+        +nav_item('/pokemon') Pokemon
+        +nav_item('#') Contact
+        +nav_item_dropdown('#')(label='Dropdown')
+            +nav_item('#') Action
+            +nav_item('#') Another action
+            +nav_item('#') Something else here
+            +nav_divider
+            +nav_header Nav header
+            +nav_item('#') Separated link
+            +nav_item('#') One more separated link
+      block content
+
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js')
+    script(src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
+    script.
+        $('a[href="' + this.location.pathname + '"]').parents('li,ul').addClass('active');

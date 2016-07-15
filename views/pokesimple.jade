@@ -1,0 +1,23 @@
+extends layout
+
+block content
+    .row
+        table.table.table-hover
+            thead
+                tr
+                    th #
+                    th Name
+                    th Height
+                    th Weight
+                    th Base XP
+            tbody
+                each poke, i in pokelist
+                    tr
+                        td #{poke.id}
+                        td #{poke.identifier}
+                        td #{poke.height}
+                        td #{poke.weight}
+                        td #{poke.base_experience}
+        
+    
+ 
