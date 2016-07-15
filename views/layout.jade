@@ -16,7 +16,7 @@ html( lang='en' )
     .container
     +nav('Pokemon', 'dropdown_menu')
         +nav_item('/') Home
-        +nav_item('/pokemon') Pokemon
+        +nav_item('/pokeballs') Pokeball Calculator
         +nav_item('#') Contact
         +nav_item_dropdown('#')(label='Dropdown')
             +nav_item('#') Action
@@ -29,6 +29,7 @@ html( lang='en' )
       block content
 
     script(src='//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js')
     script(src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
     script.
         $('a[href="' + this.location.pathname + '"]').parents('li,ul').addClass('active');

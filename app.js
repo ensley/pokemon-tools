@@ -9,7 +9,7 @@ var db = new sqlite3.Database('models/veekun-pokedex.sqlite');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var pokemon = require('./routes/pokemon');
+var pokeballs = require('./routes/pokeballs');
 
 var app = express();
 
@@ -33,7 +33,7 @@ app.use(function(req, res, next) {
 
 app.use('/', routes);
 app.use('/users', users);
-app.use('/pokemon', pokemon);
+app.use('/pokeballs', pokeballs);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
