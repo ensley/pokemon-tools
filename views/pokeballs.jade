@@ -11,7 +11,7 @@ block content
                 input(type='number', class='form-control', id='js-hpRemaining', placeholder='% HP remaining')
             button(type='submit', class=['btn', 'btn-default']) Go
 
+block scripts
     script.
         var data = !{JSON.stringify(pokelist)}
-    
-    script(src='javascripts/pokeballs-calc')
+    script(src='javascripts/pokeballs-calc.js')
