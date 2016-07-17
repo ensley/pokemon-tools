@@ -20,6 +20,29 @@ var substringMatcher = function(strs) {
   };
 };
 
+function getHPBarClass(hp) {
+    if (hp < 20) {
+        return 'low_hp';
+    } else if (hp < 50) {
+        return 'medium_hp';
+    } else {
+        return 'high_hp';
+    }
+}
+
+function update_hp() {
+    var percent = $('#js-hpRemaining').val();
+    if (percent <= 0) {
+        percent = 1;
+    } else if (percent > 100) {
+        percent = 100;
+    }
+    var hpfill = Math.ceil(percent /100 * 48);
+
+    $('#js-hpBarBar').css('width', hpfill * 2);
+    $('#js-hpBarBar').attr('class', getHPBarClass(percent));
+}
+
 $(function() {
     $('#js-wildPoke').typeahead({
         minLength: 1,
@@ -33,6 +56,17 @@ $(function() {
 
     $('#js-wildPoke').bind('typeahead:select', function(e, selection) {
         console.log('Selection: ' + selection);
+    });
+
+    $('#js-hpRemaining').keyup(update_hp);
+
+    $('#js-hpBarBar').addClass('high-hp');
+    $('#js-hpBarBar').css('width', '96px');
+
+    $('.js-hpBar').click(function(event) {
+        var offset_x = event.pageX - $(this).offset().left - $('#js-hpBarBar').position().left;
+        $('#js-hpRemaining').val(Math.max(1, Math.min(100, Math.round(offset_x * 100 / 96))));
+        update_hp();
     });
 
     $('form').submit(function(e) {

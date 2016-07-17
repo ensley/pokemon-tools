@@ -14,10 +14,10 @@ a {
 .tt-hint {
 	display: block;
 	width: 100%;
-	height: 38px;
-	padding: 8px 12px;
-	font-size: 14px;
-	line-height: 1.428571429;
+	height: 39px;
+	padding: 8px 16px;
+	font-size: 15px;
+	line-height: 1.42857143;
 	color: #999;
 	vertical-align: middle;
 	background-color: #ffffff;
@@ -56,4 +56,38 @@ a {
 }
 .tt-suggestion p {
 	margin: 0;
+}
+
+.js-hpBar {
+    display: inline-block;
+    position: relative;
+    height: 16px;
+    width: 134px;
+    margin-top: 5px;
+    background: url(/images/gen4hpbar.gif) center left no-repeat;
+}
+
+#js-hpBarBar {
+    display: block;
+    position: absolute;
+    top: 5px;
+    left: 33px;
+    height: 6px;
+    background-color: #18C020;
+    border-top: 2px solid #009000;
+}
+
+#js-hpBarBar.high_hp {
+    background-color: #18C020;
+    border-top: 2px solid #009000;
+}
+
+#js-hpBarBar.medium_hp {
+    background-color: #D7AC00;
+    border-top: 2px solid #BF7C00;
+}
+
+#js-hpBarBar.low_hp {
+    background-color:#BE2821;
+    border-top: 2px solid #A60801;
 }
