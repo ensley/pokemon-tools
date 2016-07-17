@@ -9,7 +9,8 @@ html( lang='en' )
     meta( name='viewport', content='width=device-width, initial-scale=1.0' )
     meta( name='description', content=title )
     //- Bootswatch theme
-    +bootswatch('darkly')
+    +bootswatch('superhero')
+    link(rel='stylesheet', href='/stylesheets/typeahead.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   
   body
@@ -26,7 +27,7 @@ html( lang='en' )
             +nav_header Nav header
             +nav_item('#') Separated link
             +nav_item('#') One more separated link
-      block content
+    block content
 
     script(src='//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js')

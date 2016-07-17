@@ -2,14 +2,20 @@ extends layout
 
 block content
     .row
-        form.form-inline
-            .form-group
-                label(class='sr-only', for='js-wildPoke') Wild Pokemon
-                input(type='text', class='form-control', id='js-wildPoke', placeholder='Wild Pokemon')
-            .form-group
-                label(class='sr-only', for='js-hpRemaining') HP remaining
-                input(type='number', class='form-control', id='js-hpRemaining', placeholder='% HP remaining')
-            button(type='submit', class=['btn', 'btn-default']) Go
+        .col-lg-4
+            form(class='form', method='post')
+                .form-group
+                    label(for='js-wildPoke') Wild Pokemon
+                    input(type='text', class='form-control', id='js-wildPoke', placeholder='Begin typing a Pokemon')
+                .form-group
+                    label(for='js-hpRemaining') HP remaining
+                    input(type='number', class='form-control', id='js-hpRemaining', min=1, max=100)
+                .form-group
+                    label(or='js-wildPokeLevel') Wild Pokemon level
+                    input(type='number', class='form-control', id='js-wildPokeLevel', min=2, max=100)
+                button(type='submit', class=['btn', 'btn-default']) Go
+        .col-lg-8
+            #results-container
 
 block scripts
     script.
