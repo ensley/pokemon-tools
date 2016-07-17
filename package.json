@@ -2,7 +2,7 @@
   "name": "pokemon2",
   "version": "0.0.0",
   "engines": {
-    "node": "4.7.7"
+    "node": "4.4.7"
   },
   "private": true,
   "scripts": {
