@@ -8,13 +8,11 @@ block content
                     label(for='js-wildPoke') Wild Pokemon
                     input(type='text', class='form-control', id='js-wildPoke', placeholder='Begin typing a Pokemon')
                 .form-group
-                    label(for='js-hpRemaining') % HP remaining
-                    input(type='number', class='form-control', id='js-hpRemaining', min=1, max=100)
-                    .js-hpBar
-                        #js-hpBarBar
-                .form-group
                     label(or='js-wildPokeLevel') Wild Pokemon level
                     input(type='number', class='form-control', id='js-wildPokeLevel', min=2, max=100)
+                .form-group
+                    label(for='js-hpRemaining') % HP remaining
+                    input(type='number', class='form-control', id='js-hpRemaining', min=1, max=100, value=100)
                 button(type='submit', class=['btn', 'btn-default']) Go
         .col-lg-8
             #results-container
