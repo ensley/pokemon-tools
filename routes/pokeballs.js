@@ -37,9 +37,16 @@ function shakeCheck(a) {
 
 /* GET Pokemon page. */
 router.get('/', function(req, res) {
-    var db = req.db;
+    var db = res.locals.db;
+    var squel = res.locals.squel;
     var pokeList = [];
-    db.all('SELECT name FROM pokemon_species_names JOIN pokemon ON pokemon_species_names.pokemon_species_id = pokemon.species_id WHERE pokemon_species_names.local_language_id = 9', function(err, rows) {
+    var query = squel.select()
+        .field("name")
+        .from("pokemon_species_names", "psn")
+        .join("pokemon", "p", "psn.pokemon_species_id = p.species_id")
+        .where("psn.local_language_id = 9")
+        .toString();
+    db.all(query, function(err, rows) {
         rows.map(function(row) {
             pokeList.push(row.name);
         });
@@ -53,7 +60,7 @@ router.post('/', function(req, res) {
     var wildPokemon = req.body.wildPokemon;
     var hpRemaining = req.body.hpRemaining / 100;
     var wildPokemonLevel = req.body.wildPokemonLevel;
-    var db = req.db;
+    var db = res.locals.db;
 
     calculateCatchProb(db, wildPokemon, hpRemaining, wildPokemonLevel, function(r) {
         res.send({rate: r});

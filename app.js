@@ -4,11 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var squel = require('squel');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('models/veekun-pokedex.sqlite');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var pokemon = require('./routes/pokemon');
 var pokeballs = require('./routes/pokeballs');
 
 var app = express();
@@ -27,12 +28,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // hook up db
 app.use(function(req, res, next) {
-    req.db = db;
+    res.locals.db = db;
+    res.locals.squel = squel;
     next();
 });
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/pokemon', pokemon);
 app.use('/pokeballs', pokeballs);
 
 // catch 404 and forward to error handler
