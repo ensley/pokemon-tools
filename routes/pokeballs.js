@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-function calculateCatchProb(db, wildPokemon, hpRemaining, wildPokemonLevel, callback) {
+function calculateCatchProb(db, wildPokemon, hpRemaining, callback) {
     var rate = 0;
     db.get('SELECT name, capture_rate, base_stat as base_hp FROM pokemon_species_names JOIN (SELECT * FROM pokemon_stats LEFT JOIN pokemon_species ON pokemon_stats.pokemon_id = pokemon_species.id) AS a ON pokemon_species_names.pokemon_species_id = a.id WHERE pokemon_species_names.local_language_id = 9 AND stat_id = 1 AND name = $name',
     {
@@ -9,9 +9,7 @@ function calculateCatchProb(db, wildPokemon, hpRemaining, wildPokemonLevel, call
     },
     function(err, row) {
         rate = row.capture_rate;
-        var hpApprox = calculateHP(row, parseInt(wildPokemonLevel));
-        var curHP = Math.round(hpApprox * hpRemaining);
-        var a = calculateModCatchRate(hpApprox, curHP, rate);
+        var a = calculateModCatchRate(hpRemaining, rate);
         if (a >= 255) callback(1);
         var b = shakeCheck(a);
         var modRate = Math.pow(b / 65536, 4) * 100;
@@ -19,16 +17,9 @@ function calculateCatchProb(db, wildPokemon, hpRemaining, wildPokemonLevel, call
     });
 }
 
-function calculateHP(row, level) {
-    var baseHP = row.base_hp;
-    var iv = 15;
-    var hp = Math.floor(Math.floor((2 * baseHP + iv) * level / 100) + level + 10);
-    return hp;
-}
-
-function calculateModCatchRate(maxHP, curHP, rate) {
-    // console.log('maxHP: ' + maxHP + ', curHP: ' + curHP + ', rate: ' + rate);
-    return ((3 * maxHP - 2 * curHP) * rate)/(3 * maxHP);
+function calculateModCatchRate(hpFrac, rate) {
+    // return ((3 * maxHP - 2 * curHP) * rate)/(3 * maxHP);
+    return rate - 2/3 * hpFrac * rate;
 }
 
 function shakeCheck(a) {
@@ -62,7 +53,7 @@ router.post('/', function(req, res) {
     var wildPokemonLevel = req.body.wildPokemonLevel;
     var db = res.locals.db;
 
-    calculateCatchProb(db, wildPokemon, hpRemaining, wildPokemonLevel, function(r) {
+    calculateCatchProb(db, wildPokemon, hpRemaining, function(r) {
         res.send({rate: r});
     });
 });
