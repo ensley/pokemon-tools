@@ -6,10 +6,38 @@ router.get('/', function(req, res, next) {
   res.send('pokemon page woo');
 });
 
-router.get('/:pokemon_id', function(req, res, next) {
+router.get('/:pokemon_identifier', function(req, res, next) {
     var db = res.locals.db;
+    var pokeIdentifier = req.params.pokemon_identifier;
+    // var nameQuery = pokeQueries.getNameByIdentifier(pokeIdentifier);
+    // db.get(nameQuery.text,
+    // {
+    //     $1: nameQuery.values[0]
+    // },
+    // function(err, row) {
+    //     pokeName = row.name;
+    // });
+    var pokeQueries = res.locals.pq;
+    var query = pokeQueries.getMoveset(pokeIdentifier);
+    console.log(query);
     var pokeInfo = [];
-    res.send('pokemon ' + req.params.pokemon_id);
+    db.all(query.text,
+    {
+        $1: query.values[0]
+    },
+    function(err, rows) {
+        var name = rows[0].pokemon_name;
+        console.log(rows);
+        rows.map(function(row) {
+            Object.keys(row).forEach(function(key, index) {
+                if (row[key] === null) {
+                    row[key] = '\u2014';
+                }
+            });
+        });
+        // res.send('pokemon ' + req.params.pokemon_id + '\n' + row.toString());
+        res.render('pokemoninfo', { pokeName: name, pokeMoves: rows });
+    });
 });
 
 module.exports = router;
