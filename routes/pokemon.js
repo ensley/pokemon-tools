@@ -7,6 +7,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/:pokemon_id', function(req, res, next) {
+    var db = res.locals.db;
+    var pokeInfo = [];
     res.send('pokemon ' + req.params.pokemon_id);
 });
 

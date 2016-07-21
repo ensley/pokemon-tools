@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-function calculateCatchProb(db, wildPokemon, hpRemaining, callback) {
+function calculateCatchProb(db, pokeQueries, wildPokemon, hpRemaining, callback) {
     var rate = 0;
-    db.get('SELECT name, capture_rate, base_stat as base_hp FROM pokemon_species_names JOIN (SELECT * FROM pokemon_stats LEFT JOIN pokemon_species ON pokemon_stats.pokemon_id = pokemon_species.id) AS a ON pokemon_species_names.pokemon_species_id = a.id WHERE pokemon_species_names.local_language_id = 9 AND stat_id = 1 AND name = $name',
+    var query = pokeQueries.getCaptureStats(wildPokemon);
+    db.get(query.text,
     {
-        $name: wildPokemon
+        $1: query.values[0]
     },
     function(err, row) {
         rate = row.capture_rate;
@@ -29,14 +30,10 @@ function shakeCheck(a) {
 /* GET Pokemon page. */
 router.get('/', function(req, res) {
     var db = res.locals.db;
-    var squel = res.locals.squel;
+    var pokeQueries = res.locals.pq;
     var pokeList = [];
-    var query = squel.select()
-        .field("name")
-        .from("pokemon_species_names", "psn")
-        .join("pokemon", "p", "psn.pokemon_species_id = p.species_id")
-        .where("psn.local_language_id = 9")
-        .toString();
+    var query = pokeQueries.getAllPokemon();
+
     db.all(query, function(err, rows) {
         rows.map(function(row) {
             pokeList.push(row.name);
@@ -48,12 +45,13 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
+    var db = res.locals.db;
+    var pokeQueries = res.locals.pq;
     var wildPokemon = req.body.wildPokemon;
     var hpRemaining = req.body.hpRemaining / 100;
     var wildPokemonLevel = req.body.wildPokemonLevel;
-    var db = res.locals.db;
 
-    calculateCatchProb(db, wildPokemon, hpRemaining, function(r) {
+    calculateCatchProb(db, pokeQueries, wildPokemon, hpRemaining, function(r) {
         res.send({rate: r});
     });
 });

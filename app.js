@@ -11,6 +11,7 @@ var db = new sqlite3.Database('models/veekun-pokedex.sqlite');
 var routes = require('./routes/index');
 var pokemon = require('./routes/pokemon');
 var pokeballs = require('./routes/pokeballs');
+var pokeQueries = require('./models/queries.js');
 
 var app = express();
 
@@ -29,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // hook up db
 app.use(function(req, res, next) {
     res.locals.db = db;
-    res.locals.squel = squel;
+    res.locals.pq = pokeQueries;
     next();
 });
 
