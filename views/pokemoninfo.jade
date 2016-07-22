@@ -3,22 +3,37 @@ extends layout
 block content
     h1 #{pokeName}
     .row
-        .col-lg-12
-            table.table.table-hover
-                thead
-                    th Level learned
-                    th Move
-                    th Type
-                    th Power
-                    th Accuracy
-                    th PP
-                tbody
-                    each move, i in pokeMoves
-                        tr
-                            td #{move.level}
-                            td #{move.move_name}
-                            td #{move.identifier}
-                            td #{move.power} 
-                            td #{move.accuracy}
-                            td #{move.pp}
+        .col-lg-4
+            ul(class="nav nav-tabs", role="tablist")
+                li(role="presentation", class="active")
+                    a(href="#mvs-levelup", aria-controls="level-up", role="tab", data-toggle="tab") Level Up
+                li(role="presentation")
+                    a(href="#mvs-egg", aria-controls="egg", role="tab", data-toggle="tab") Egg
+                li(role="presentation")
+                    a(href="#mvs-tutor", aria-controls="tutor", role="tab", data-toggle="tab") Tutor
+                li(role="presentation")
+                    a(href="#mvs-machine", aria-controls="machine", role="tab", data-toggle="tab") Machine
+            .tab-content
+                div(role="tabpanel", class="tab-pane fade in active", id="mvs-levelup")
+                    table.table.table-hover
+                        thead
+                            th Level learned
+                            th Move
+                            th Type
+                            th Power
+                            th Accuracy
+                            th PP
+                        tbody
+                            each move, i in pokeMoves
+                                tr
+                                    td #{move.level}
+                                    td #{move.move_name}
+                                    td #{move.identifier}
+                                    td #{move.power} 
+                                    td #{move.accuracy}
+                                    td #{move.pp}
+                div(role="tabpanel", class="tab-pane fade", id="mvs-egg")
+                div(role="tabpanel", class="tab-pane fade", id="mvs-tutor")
+                div(role="tabpanel", class="tab-pane fade", id="mvs-machine")
+            
                                 

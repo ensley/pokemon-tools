@@ -9,14 +9,6 @@ router.get('/', function(req, res, next) {
 router.get('/:pokemon_identifier', function(req, res, next) {
     var db = res.locals.db;
     var pokeIdentifier = req.params.pokemon_identifier;
-    // var nameQuery = pokeQueries.getNameByIdentifier(pokeIdentifier);
-    // db.get(nameQuery.text,
-    // {
-    //     $1: nameQuery.values[0]
-    // },
-    // function(err, row) {
-    //     pokeName = row.name;
-    // });
     var pokeQueries = res.locals.pq;
     var query = pokeQueries.getMoveset(pokeIdentifier);
     console.log(query);
