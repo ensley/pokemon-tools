@@ -1,26 +1,3 @@
-// matcher function for typeahead
-var substringMatcher = function(strs) {
-  return function findMatches(q, cb) {
-    var matches, substringRegex;
-
-    // an array that will be populated with substring matches
-    matches = [];
-
-    // regex used to determine if a string contains the substring `q`
-    substrRegex = new RegExp(q, 'i');
-
-    // iterate through the pool of strings and for any string that
-    // contains the substring `q`, add it to the `matches` array
-    $.each(strs, function(i, str) {
-      if (substrRegex.test(str)) {
-        matches.push(str);
-      }
-    });
-
-    cb(matches);
-  };
-};
-
 var pokeballs_calc = {
     // Create the HP-remaining bar and hide it by default
     'initialize': function() {
@@ -95,17 +72,6 @@ function getHPBarClass(hp) {
 }
 
 $(function() {
-    // typeahead
-    $('#js-wildPoke').typeahead({
-        minLength: 1,
-        highlight: true,
-        hint: true
-    },
-    {
-        name: 'pokelist',
-        source: substringMatcher(data)
-    });
-    // push the form data to the server for processing
     $('form').submit(function(e) {
         var formData = {
             'wildPokemon': $('#js-wildPoke').val(),

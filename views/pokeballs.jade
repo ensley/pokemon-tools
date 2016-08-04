@@ -6,7 +6,7 @@ block content
             form(class='form', method='post')
                 .form-group
                     label(for='js-wildPoke') Wild Pokemon
-                    input(type='text', class='form-control', id='js-wildPoke', placeholder='Begin typing a Pokemon')
+                    input(type='text', class='form-control input-typeahead', id='js-wildPoke', placeholder='Begin typing a Pokemon')
                 .form-group
                     label(for='js-hpRemaining') % HP remaining
                     input(type='number', class='form-control', id='js-hpRemaining', min=1, max=100, value=100)
@@ -17,4 +17,5 @@ block content
 block scripts
     script.
         var data = !{JSON.stringify(pokelist)}
-    script(src='javascripts/pokeballs-calc.js')
+    script(src='javascripts/pokeballs-calc2.js')
+    script(src='javascripts/pokemon-typeahead.js')

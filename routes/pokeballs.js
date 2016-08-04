@@ -9,6 +9,7 @@ function calculateCatchProb(db, pokeQueries, wildPokemon, hpRemaining, callback)
         $1: query.values[0]
     },
     function(err, row) {
+        console.log(row);
         rate = row.capture_rate;
         var a = calculateModCatchRate(hpRemaining, rate);
         if (a >= 255) callback(1);
