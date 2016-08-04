@@ -28,6 +28,8 @@ var pokeballApp = (function() {
         config.$hpTextContainer.keyup( update_hp_bar );
 
         $('form').submit( click_submit );
+
+        update_hp_bar();
     };
 
     var update_hp_bar = function() {
@@ -52,7 +54,7 @@ var pokeballApp = (function() {
     var click_hp_bar = function( e ) {
         var $this = $( this );
         var offset_x = e.pageX - $this.offset().left - $hp_inner_bar.position().left;
-        $hpTextContainer.val( Math.max( 1, Math.min( 100, Math.round( offset_x * 100 / 96 ) ) ) );
+        config.$hpTextContainer.val( Math.max( 1, Math.min( 100, Math.round( offset_x * 100 / 96 ) ) ) );
 
         update_hp_bar();
     };

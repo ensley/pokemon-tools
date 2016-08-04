@@ -2,17 +2,25 @@ extends layout
 
 block content
     .row
-        .col-lg-4
-            form(class='form', method='post')
-                .form-group
-                    label(for='js-wildPoke') Wild Pokemon
-                    input(type='text', class='form-control input-typeahead', id='js-wildPoke', placeholder='Begin typing a Pokemon')
-                .form-group
-                    label(for='js-hpRemaining') % HP remaining
-                    input(type='number', class='form-control', id='js-hpRemaining', min=1, max=100, value=100)
-                button(type='submit', class=['btn', 'btn-default']) Go
-        .col-lg-8
-            #results-container
+        .panel.panel-primary
+            .panel-heading
+                h3.panel-title Target Pokemon
+            .panel-body
+                form(class='form', method='post')
+                    .form-group
+                        label(for='js-wildPoke') Wild Pokemon
+                        input(type='text', class='form-control input-typeahead', id='js-wildPoke', placeholder='Begin typing a Pokemon')
+                    .form-group
+                        label(for='js-hpRemaining') % HP remaining
+                        input(type='number', class='form-control', id='js-hpRemaining', min=1, max=100, value=100)
+                    .form-group
+                        label(for='js-status') Status ailment
+                        select(class='form-control', id='js-status')
+                            each val in ailments
+                                option= val
+                    button(type='submit', class=['btn', 'btn-default']) Go
+    .row
+        #results-container
 
 block scripts
     script.

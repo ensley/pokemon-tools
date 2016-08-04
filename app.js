@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var squel = require('squel');
+var async = require('async');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('models/veekun-pokedex.sqlite');
 
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req, res, next) {
     res.locals.db = db;
     res.locals.pq = pokeQueries;
+    res.locals.async = async;
     next();
 });
 

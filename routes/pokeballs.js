@@ -32,17 +32,51 @@ function shakeCheck(a) {
 router.get('/', function(req, res) {
     var db = res.locals.db;
     var pokeQueries = res.locals.pq;
+    var async = res.locals.async;
     var pokeList = [];
-    var query = pokeQueries.getAllPokemon();
+    var queryAllPokemon = pokeQueries.getAllPokemon();
+    var queryAllAilments = pokeQueries.getAllAilments();
 
-    db.all(query, function(err, rows) {
-        rows.map(function(row) {
-            pokeList.push(row.name);
-        });
-        res.render('pokeballs', {
-            'pokelist': pokeList
-        });
-    });
+    var results1 = function( callback ) {
+        var result = [];
+        db.all( queryAllAilments, function( err, rows ) {
+            rows.map( function( row ) {
+                result.push( row.name );
+            } );
+            callback( null, result );
+        } );
+    };
+
+    var results2 = function( callback ) {
+        var result = [];
+        db.all( queryAllPokemon, function( err, rows ) {
+            rows.map( function( row ) {
+                result.push( row.name );
+            } );
+            callback( null, result );
+        } );
+    };
+
+    async.parallel({
+        ailments: results1,
+        pokelist: results2
+    }, function( err, results ) {
+        console.log( results );
+        res.render( 'pokeballs', {
+            'ailments': results.ailments,
+            'pokelist': results.pokelist
+        } );
+    } );
+
+    // db.all(query, function(err, rows) {
+    //     rows.map(function(row) {
+    //         pokeList.push(row.name);
+    //     });
+    //     res.render('pokeballs', {
+    //         'pokelist': pokeList,
+    //         'ailments': ailments
+    //     });
+    // });
 });
 
 router.post('/', function(req, res) {
