@@ -9,13 +9,13 @@ block content
                 form(class='form', method='post')
                     .form-group
                         label(for='js-wildPoke') Wild Pokemon
-                        input(type='text', class='form-control input-typeahead', id='js-wildPoke', placeholder='Begin typing a Pokemon')
+                        input(type='text', class='form-control input-typeahead', id='js-wildPoke', name='wildPoke', placeholder='Begin typing a Pokemon')
                     .form-group
                         label(for='js-hpRemaining') % HP remaining
-                        input(type='number', class='form-control', id='js-hpRemaining', min=1, max=100, value=100)
+                        input(type='number', class='form-control', id='js-hpRemaining', name='hpRemaining', min=1, max=100, value=100)
                     .form-group
                         label(for='js-status') Status ailment
-                        select(class='form-control', id='js-status')
+                        select(class='form-control', id='js-status', name='status')
                             each val in ailments
                                 option= val
                     button(type='submit', class=['btn', 'btn-default']) Go

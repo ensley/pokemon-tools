@@ -5,7 +5,7 @@ var captureProb = (function() {
 
     var calculate = function( db, pq, body, callback ) {
 
-        var query = pq.getCaptureStats( body.wildPokemon );
+        var query = pq.getCaptureStats( body.wildPoke );
         db.get( query.text, {
             $1: query.values[0]
         }, function( err, row ) {
@@ -100,6 +100,8 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
+
+    console.log( req.body );
 
     captureProb.calculate( res.locals.db, res.locals.pq, req.body, function( r ) {
         res.send({ rate: r });

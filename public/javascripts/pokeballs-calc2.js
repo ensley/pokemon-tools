@@ -27,7 +27,7 @@ var pokeballApp = (function() {
         config.$hpTextContainer.after( $hp );
         config.$hpTextContainer.keyup( update_hp_bar );
 
-        $('form').submit( click_submit );
+        $('form').submit( submit_data );
 
         update_hp_bar();
     };
@@ -59,23 +59,23 @@ var pokeballApp = (function() {
         update_hp_bar();
     };
 
-    var click_submit = function( e ) {
-        var formData = {
-            'wildPokemon': config.$wildPokeContainer.val(),
-            'hpRemaining': config.$hpTextContainer.val(),
-            'wildPokemonLevel': config.$wildPokeLevelContainer.val()
-        };
-        submit_data( formData );
-        e.preventDefault();
-    };
+    // var click_submit = function( e ) {
+    //     var formData = {
+    //         'wildPokemon': config.$wildPokeContainer.val(),
+    //         'hpRemaining': config.$hpTextContainer.val(),
+    //         'wildPokemonLevel': config.$wildPokeLevelContainer.val()
+    //     };
+    //     submit_data( formData );
+    //     e.preventDefault();
+    // };
 
-    var submit_data = function( formData ) {
+    var submit_data = function( e ) {
+        e.preventDefault();
+        console.log( $( this ) );
         $.ajax({
             type: 'POST',
             url: '/pokeballs',
-            data: formData,
-            dataType: 'json',
-            encode: true
+            data: $( this ).serialize()
         }).done( function( data ) {
             write_results( data );
         } );
