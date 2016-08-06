@@ -3,14 +3,29 @@ var router = express.Router();
 
 var captureProb = (function() {
 
-    var calculate = function( db, pq, body, callback ) {
+    var statusBonus = {
+        'none': 1,
+        'Paralysis': 1.5,
+        'Poison': 1.5,
+        'Burn': 1.5,
+        'Sleep': 2,
+        'Freeze': 2
+    };
+
+    var ballBonus = {
+        'poke-ball': 1,
+        'great-ball': 1.5,
+        'ultra-ball': 2
+    };
+
+    var calculate = function( db, pq, body, ball, callback ) {
 
         var query = pq.getCaptureStats( body.wildPoke );
         db.get( query.text, {
             $1: query.values[0]
         }, function( err, row ) {
             var rate = row.capture_rate;
-            var a = modifiedCatchRate( body.hpRemaining / 100, rate );
+            var a = modifiedCatchRate( body.hpRemaining / 100, rate, body.status, ball );
             var b = shakeCheck( a );
             var prob = Math.pow( b / 65536, 4 ) * 100;
             callback( prob );
@@ -18,8 +33,9 @@ var captureProb = (function() {
 
     };
 
-    var modifiedCatchRate = function( hpFrac, rate ) {
-        return rate - 2 / 3 * hpFrac * rate;
+    var modifiedCatchRate = function( hpFrac, rate, status, ball ) {
+        console.log( statusBonus[ status ]);
+        return ( rate - 2 / 3 * hpFrac * rate ) * statusBonus[ status ];
     };
 
     var shakeCheck = function( rate ) {
@@ -50,7 +66,6 @@ function calculateCatchProb(db, pokeQueries, wildPokemon, hpRemaining, callback)
 }
 
 function calculateModCatchRate(hpFrac, rate) {
-    // return ((3 * maxHP - 2 * curHP) * rate)/(3 * maxHP);
     return rate - 2/3 * hpFrac * rate;
 }
 
@@ -100,8 +115,6 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-
-    console.log( req.body );
 
     captureProb.calculate( res.locals.db, res.locals.pq, req.body, function( r ) {
         res.send({ rate: r });
