@@ -95,6 +95,162 @@ var captureProb = (function() {
                         ballObj.cases[i].notes = txt;
                     } );
 
+                } else if( ball === 'lure-ball') {
+
+                    var modRates = [3, 1].map( function( mult ) {
+                        return modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [ 'Fishing',
+                    'Otherwise' ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                } else if( ball === 'love-ball' ) {
+
+                    var modRates = [8, 1].map( function( mult ) {
+                        return modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [ 'Target is same species and opposite gender',
+                    'Otherwise' ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                } else if( ball === 'heavy-ball' ) {
+
+                    var modRates = [-20, 20, 30, 40].map( function( add ) {
+                        return modifiedCatchRate( hpFrac, baseRate + add, statusBonuses[ status ], 1 );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [
+                        'Target weight \u2264 204.8 kg',
+                        '204.8 kg \x3C target weight \u2264 307.2 kg',
+                        '307.2 kg \x3C target weight \u2264 409.6 kg',
+                        '409.6 kg \x3C target weight'
+                    ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                } else if ( ball === 'fast-ball' ) {
+
+                    var modRates = [4, 1].map( function( mult ) {
+                        return modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [
+                        'Target base speed \x3E 100',
+                        'Otherwise'
+                    ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                } else if( ball === 'net-ball' ) {
+
+                    var modRates = [3, 1].map( function( mult ) {
+                        return modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [
+                        'Target is Water or Bug type',
+                        'Otherwise'
+                    ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                } else if( ball === 'nest-ball' ) {
+
+                    var level = body.wildLevel || 5;
+                    console.log( level );
+
+                    var mult = Math.max(( 40 - level ) / 10, 1);
+                    var modRate = modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+
+                    var shakeProb = shakeCheck( modRate );
+                    var shakeArray = calculateShakeArray( shakeProb );
+                    ballObj.shakes = shakeArray;
+                    ballObj.notes = 'Better against lower-level targets. Worst at level 30+';
+
+                } else {
+                    var modRate = modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], ballBonuses[ ball ]);
+                    var shakeProb = shakeCheck( modRate );
+                    var shakeArray = calculateShakeArray( shakeProb );
+                    ballObj.shakes = shakeArray;
                 }
 
                 ballProbs.push( ballObj );

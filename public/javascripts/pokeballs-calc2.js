@@ -61,7 +61,7 @@ var pokeballApp = (function() {
 
     var submit_data = function( e ) {
         e.preventDefault();
-        console.log( $( this ) );
+        $('#results-container').html( '' );
         $.ajax({
             type: 'POST',
             url: '/pokeballs',
@@ -79,34 +79,85 @@ var pokeballApp = (function() {
             var ballElement = $('<tbody/>');
             if( typeof ball.cases === 'undefined' ) {
                 ballElement.append($('<tr/>')
-                    .append($('<th/>')
+                    .append($('<th/>', {
+                        class: 'item'
+                    })
                         .text( ball.name )
                     )
-                    .append($('<td/>'))
-                    .append($('<td/>'))
-                    .append($('<td/>')));
+                    .append($('<td/>', {
+                        class: 'chance'
+                    })
+                        .append($('<div/>', {
+                            class: 'js-capture-rate-graph',
+                            title: 'Capture: ' + ball.shakes[4].toFixed(1) + '%'
+                        })))
+                    .append($('<td/>', {
+                        class: 'chance'
+                    })
+                        .text( ball.shakes[4].toFixed(1) + '%' ))
+                    .append($('<td/>', {
+                        class: 'expected-attempts'
+                    })
+                        .text( (100 / ball.shakes[4]).toFixed(1) ))
+                    .append($('<td/>', {
+                        class: 'condition'
+                    })
+                        .text( ball.notes )));
+
+                for( var j = 0; j < 4; j++ ) {
+                    ballElement.find( '.js-capture-rate-graph' ).append(
+                        $('<div/>', {
+                            class: 'js-capture-rate-graph-bar shake' + j,
+                            title: j + ' shakes: ' + ball.shakes[j].toFixed(1) + '%',
+                            style: 'width: ' + ball.shakes[j] + '%'
+                        } )
+                    );
+                }
             } else {
                 ball.cases.map( function( c, i ) {
-                    var $blah = $('<tr/>');
+                    var $blah = $('<tr/>', {
+                        class: 'inactive'
+                    });
                     if( i === 0) {
                         $blah.append($('<th/>', {
-                            rowspan: ball.cases.length
+                            rowspan: ball.cases.length,
+                            class: 'item'
                         })
                             .text( ball.name ));
                     }
-                    $blah.append($('<td/>')
+                    $blah.append($('<td/>', {
+                        class: 'chance'
+                    })
                             .append($('<div/>', {
-                                class: 'js-capture-rate-graph'
+                                class: 'js-capture-rate-graph',
+                                title: 'Capture: ' + c.shakes[4].toFixed(1) + '%'
                             })))
-                        .append($('<td/>')
-                            .text( 'blah1' ))
-                        .append($('<td/>')
+                        .append($('<td/>', {
+                            class: 'chance'
+                        })
+                            .text( c.shakes[4].toFixed(1) + '%' ))
+                        .append($('<td/>', {
+                            class: 'expected-attempts'
+                        })
+                            .text( (100 / c.shakes[4]).toFixed(1) ))
+                        .append($('<td/>', {
+                            class: 'condition'
+                        })
                             .text( c.notes )
                     );
+                    for( var j = 0; j < 4; j++ ) {
+                        $blah.find( '.js-capture-rate-graph' ).append(
+                            $('<div/>', {
+                                class: 'js-capture-rate-graph-bar shake' + j,
+                                title: j + ' shakes: ' + c.shakes[4].toFixed(1) + '%',
+                                style: 'width: ' + c.shakes[j] + '%'
+                            } )
+                        );
+                    }
+
                     ballElement.append($blah);
                 });
             }
-
 
             $container.append( ballElement );
         });
