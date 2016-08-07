@@ -2,14 +2,12 @@ extends layout
 
 block content
     .row
-        .panel.panel-primary
-            .panel-heading
-                h3.panel-title Target Pokemon
-            .panel-body
-                form(class='form', method='post')
+        .col-md-4
+            form(class='form', method='post')
+                +panel('Target Pokemon', 'primary')              
                     .form-group
                         label(for='js-wildPoke') Wild Pokemon
-                        input(type='text', class='form-control input-typeahead', id='js-wildPoke', name='wildPoke', placeholder='Begin typing a Pokemon')
+                        input(type='text', class='form-control input-typeahead', id='js-wildPoke', name='wildPoke', placeholder='Begin typing a Pokemon' required)
                     .form-group
                         label(for='js-hpRemaining') % HP remaining
                         input(type='number', class='form-control', id='js-hpRemaining', name='hpRemaining', min=1, max=100, value=100)
@@ -18,9 +16,32 @@ block content
                         select(class='form-control', id='js-status', name='status')
                             each val in ailments
                                 option= val
-                    button(type='submit', class=['btn', 'btn-default']) Go
-    .row
-        #results-container
+                +panel('Optional Settings', 'primary')
+                    .form-group
+                        label(for='js-wildLevel') Wild Pokemon level
+                        input(type='number', class='form-control', id='js-wildLevel', name='wildLevel', min=1, max=100)
+                    .form-group
+                        label(for='js-yourLevel') Your Pokemon level
+                        input(type='number', class='form-control', id='js-yourLevel', name='yourLevel', min=1, max=100)
+                    .form-group
+                        label(for='js-terrain') Terrain:
+                        select(class='form-control', id='js-terrain', name='terrain')
+                            option(value='land') On land
+                            option(value='surfing') Surfing
+                            option(value='fishing') Fishing
+                    +checkbox('Wild Pokemon and your Pokemon are the same species and opposite genders', 'oppSex')
+                    +checkbox('Wild Pokemon is in your Pokedex', 'inDex')
+                    +checkbox('Nighttime or walking in a cave', 'nightOrCave')
+                button(type='submit', class=['btn', 'btn-default']) Go
+        .col-md-8
+            +panel('Results', 'primary')
+                table(class='table', id='results-container')
+                    thead
+                        tr
+                            th Ball
+                            th Capture chance
+                            th Average tries
+                            th Notes
 
 block scripts
     script.

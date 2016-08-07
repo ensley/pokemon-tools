@@ -44,7 +44,8 @@ mixin nav_header
 mixin panel(heading, style)
     - var style = (typeof style === 'undefined') ? 'default' : style
     div(class=['panel', 'panel-' + style])
-        .panel-heading= heading
+        .panel-heading
+            h3.panel-title= heading
         .panel-body
             block
 //- end panel mixin
@@ -108,6 +109,14 @@ mixin listText
     .list-group-item-text
         block
 //- end list group mixins
+
+mixin checkbox(text, name)
+    - var name = (typeof name === 'undefined') ? '' : name
+    div(class='checkbox')
+        label
+            input(type='checkbox', name=name)
+            | !{text}
+    block
 
 
 //- Bootswatch mixin

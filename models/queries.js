@@ -24,13 +24,30 @@ var pokeQueries = {
     'getCaptureStats': function(pokeName) {
         return squel.select({ numberedParameters: true })
             .field("psn.name")
+            .field("pspec.evolution_chain_id")
+            .field("p.height")
+            .field("p.weight")
             .field("pspec.capture_rate")
-            .field("pstat.base_stat", "base_hp")
-            .from("pokemon_stats", "pstat")
-            .left_join("pokemon_species", "pspec", "pstat.pokemon_id = pspec.id")
+            .field(
+                squel.select()
+                    .field("base_stat")
+                    .from("pokemon_stats", "pstat")
+                    .where("stat_id = 1")
+                    .where("pokemon_id = psn.pokemon_species_id"),
+                "base_hp"
+            )
+            .field(
+                squel.select()
+                    .field("base_stat")
+                    .from("pokemon_stats", "pstat")
+                    .where("stat_id = 6")
+                    .where("pokemon_id = psn.pokemon_species_id"),
+                "base_speed"
+            )
+            .from("pokemon_species", "pspec")
             .join("pokemon_species_names", "psn", "psn.pokemon_species_id = pspec.id")
+            .join("pokemon", "p", "pspec.id = p.id")
             .where("psn.local_language_id = 9")
-            .where("pstat.stat_id = 1")
             .where("psn.name = ?", pokeName)
             .toParam();
     },
@@ -70,6 +87,21 @@ var pokeQueries = {
             .where("local_language_id = 9")
             .where("move_meta_ailment_id >= 0")
             .where("move_meta_ailment_id <= 5")
+            .toString();
+    },
+
+    'getBalls': function() {
+        return squel.select()
+            .field("item_id", "id")
+            .field("identifier")
+            .field("inames.name", "ball_name")
+            .field("icp.name", "category")
+            .from("item_names", "inames")
+            .left_join("items", "i", "inames.item_id = i.id")
+            .left_join("item_category_prose", "icp", "icp.item_category_id = i.category_id")
+            .where("i.category_id IN (33, 34, 39)")
+            .where("inames.local_language_id = 9")
+            .order("category", false)
             .toString();
     }
 };

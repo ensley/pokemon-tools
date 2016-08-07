@@ -59,16 +59,6 @@ var pokeballApp = (function() {
         update_hp_bar();
     };
 
-    // var click_submit = function( e ) {
-    //     var formData = {
-    //         'wildPokemon': config.$wildPokeContainer.val(),
-    //         'hpRemaining': config.$hpTextContainer.val(),
-    //         'wildPokemonLevel': config.$wildPokeLevelContainer.val()
-    //     };
-    //     submit_data( formData );
-    //     e.preventDefault();
-    // };
-
     var submit_data = function( e ) {
         e.preventDefault();
         console.log( $( this ) );
@@ -82,8 +72,44 @@ var pokeballApp = (function() {
     };
 
     var write_results = function( data ) {
-        var rate = Math.round( data.rate * 100) / 100;
-        $( '#results-container' ).text( 'About a ' + rate + '% chance of capture.' );
+        console.log( data );
+        var $container = $('#results-container');
+        $container.css( 'display', '' );
+        data.ballProbs.map( function( ball ) {
+            var ballElement = $('<tbody/>');
+            if( typeof ball.cases === 'undefined' ) {
+                ballElement.append($('<tr/>')
+                    .append($('<th/>')
+                        .text( ball.name )
+                    )
+                    .append($('<td/>'))
+                    .append($('<td/>'))
+                    .append($('<td/>')));
+            } else {
+                ball.cases.map( function( c, i ) {
+                    var $blah = $('<tr/>');
+                    if( i === 0) {
+                        $blah.append($('<th/>', {
+                            rowspan: ball.cases.length
+                        })
+                            .text( ball.name ));
+                    }
+                    $blah.append($('<td/>')
+                            .append($('<div/>', {
+                                class: 'js-capture-rate-graph'
+                            })))
+                        .append($('<td/>')
+                            .text( 'blah1' ))
+                        .append($('<td/>')
+                            .text( c.notes )
+                    );
+                    ballElement.append($blah);
+                });
+            }
+
+
+            $container.append( ballElement );
+        });
     };
 
     var getHPBarClass = function( hp ) {
@@ -103,5 +129,6 @@ var pokeballApp = (function() {
 })();
 
 $(function() {
+    $( '.table' ).css( 'display', 'none' );
     pokeballApp.initialize();
 });

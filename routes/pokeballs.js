@@ -3,7 +3,7 @@ var router = express.Router();
 
 var captureProb = (function() {
 
-    var statusBonus = {
+    var statusBonuses = {
         'none': 1,
         'Paralysis': 1.5,
         'Poison': 1.5,
@@ -12,34 +12,120 @@ var captureProb = (function() {
         'Freeze': 2
     };
 
-    var ballBonus = {
-        'poke-ball': 1,
-        'great-ball': 1.5,
-        'ultra-ball': 2
+    var ballBonuses = {
+        'master-ball':  1,
+        'ultra-ball':   2,
+        'great-ball':   1.5,
+        'poke-ball':    1,
+        'safari-ball':  1.5,
+        'park-ball':    1,
+        'sport-ball':   1.5,
+        'net-ball':     1,
+        'dive-ball':    1,
+        'nest-ball':    1,
+        'repeat-ball':  1,
+        'timer-ball':   1,
+        'luxury-ball':  1,
+        'premier-ball': 1,
+        'dusk-ball':    1,
+        'heal-ball':    1,
+        'quick-ball':   1,
+        'dream-ball':   1,
+        'lure-ball':    1,
+        'level-ball':   1,
+        'moon-ball':    1,
+        'heavy-ball':   1,
+        'fast-ball':    1,
+        'friend-ball':  1,
+        'love-ball':    1
+    };
+
+    var captureObject = {};
+
+    var toProperCase = function ( str ) {
+        str = str.replace(/-/g, ' ');
+        return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
     };
 
     var calculate = function( db, pq, body, ball, callback ) {
+
+        var hpFrac = body.hpRemaining / 100;
+        var status = body.status;
+
+        var balls = Object.keys( ballBonuses );
+        var ballProbs = [];
 
         var query = pq.getCaptureStats( body.wildPoke );
         db.get( query.text, {
             $1: query.values[0]
         }, function( err, row ) {
-            var rate = row.capture_rate;
-            var a = modifiedCatchRate( body.hpRemaining / 100, rate, body.status, ball );
-            var b = shakeCheck( a );
-            var prob = Math.pow( b / 65536, 4 ) * 100;
-            callback( prob );
+            console.log( row );
+
+            balls.map( function( ball ) {
+                var ballObj = {};
+                var baseRate = row.capture_rate;
+
+                ballObj.name = toProperCase( ball );
+
+
+                if( ball === 'level-ball' ) {
+                    var modRates = [ 1, 2, 4, 8 ].map( function( mult ) {
+                        return modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [ 'Your level \x3C target level',
+                    'Target level \x3C your level \u2264 2 \xD7 target level',
+                    '2 \xD7 target level \x3C your level \u2264 4 \xD7 target level',
+                    '4 \xD7 target level \x3C your level' ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                }
+
+                ballProbs.push( ballObj );
+            } );
+
+            console.log(ballProbs);
+
+            callback( ballProbs );
         });
 
     };
 
-    var modifiedCatchRate = function( hpFrac, rate, status, ball ) {
-        console.log( statusBonus[ status ]);
-        return ( rate - 2 / 3 * hpFrac * rate ) * statusBonus[ status ];
+    var modifiedCatchRate = function( hpFrac, rate, statusMultiplier, ballMultiplier ) {
+        var result = Math.min(( 1 - 2 / 3 * hpFrac ) * rate * statusMultiplier * ballMultiplier, 255);
+        return result;
     };
 
     var shakeCheck = function( rate ) {
         return Math.floor(1048560 / Math.floor(Math.sqrt(Math.floor(Math.sqrt(Math.floor(16711680 / rate))))));
+    };
+
+    var calculateShakeArray = function( prob ) {
+        var p = prob / 65536;
+        var arr = [
+            1 - p,
+            p * (1 - p),
+            Math.pow(p, 2) * (1 - p),
+            Math.pow(p, 3) * (1 - p),
+            Math.pow(p, 4)
+        ];
+        return arr.map( function( val ) { return val * 100; });
     };
 
     return {
@@ -48,63 +134,27 @@ var captureProb = (function() {
 
 })();
 
-function calculateCatchProb(db, pokeQueries, wildPokemon, hpRemaining, callback) {
-    var rate = 0;
-    var query = pokeQueries.getCaptureStats(wildPokemon);
-    db.get(query.text,
-    {
-        $1: query.values[0]
-    },
-    function(err, row) {
-        rate = row.capture_rate;
-        var a = calculateModCatchRate(hpRemaining, rate);
-        if (a >= 255) callback(1);
-        var b = shakeCheck(a);
-        var modRate = Math.pow(b / 65536, 4) * 100;
-        callback(modRate);
-    });
-}
-
-function calculateModCatchRate(hpFrac, rate) {
-    return rate - 2/3 * hpFrac * rate;
-}
-
-function shakeCheck(a) {
-    return Math.floor(1048560 / Math.floor(Math.sqrt(Math.floor(Math.sqrt(Math.floor(16711680 / a))))));
-}
-
 /* GET Pokemon page. */
 router.get('/', function(req, res) {
-    var db = res.locals.db;
-    var pokeQueries = res.locals.pq;
-    var async = res.locals.async;
-    var pokeList = [];
-    var queryAllPokemon = pokeQueries.getAllPokemon();
-    var queryAllAilments = pokeQueries.getAllAilments();
 
-    var results1 = function( callback ) {
-        var result = [];
-        db.all( queryAllAilments, function( err, rows ) {
-            rows.map( function( row ) {
-                result.push( row.name );
+    var queryAllPokemon = res.locals.pq.getAllPokemon();
+    var queryAllAilments = res.locals.pq.getAllAilments();
+
+    var sendQuery = function( query ) {
+        return function( callback ) {
+            var result = [];
+            res.locals.db.all( query, function( err, rows ) {
+                rows.map( function( row ) {
+                    result.push( row.name );
+                } );
+                callback( null, result );
             } );
-            callback( null, result );
-        } );
+        };
     };
 
-    var results2 = function( callback ) {
-        var result = [];
-        db.all( queryAllPokemon, function( err, rows ) {
-            rows.map( function( row ) {
-                result.push( row.name );
-            } );
-            callback( null, result );
-        } );
-    };
-
-    async.parallel({
-        ailments: results1,
-        pokelist: results2
+    res.locals.async.parallel({
+        ailments: sendQuery( res.locals.pq.getAllAilments() ),
+        pokelist: sendQuery( res.locals.pq.getAllPokemon() )
     }, function( err, results ) {
         res.render( 'pokeballs', {
             'ailments': results.ailments,
@@ -116,8 +166,9 @@ router.get('/', function(req, res) {
 
 router.post('/', function(req, res) {
 
-    captureProb.calculate( res.locals.db, res.locals.pq, req.body, function( r ) {
-        res.send({ rate: r });
+    captureProb.calculate( res.locals.db, res.locals.pq, req.body, undefined, function( r ) {
+        // res.send({ rate: r });
+        res.send({ ballProbs: r });
     });
 
 });
