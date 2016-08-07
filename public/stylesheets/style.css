@@ -99,6 +99,10 @@ a {
     background: #79cc66;
 }
 
+.table>thead>tr>th {
+    text-align: center;
+}
+
 .table>tbody>tr>th {
     vertical-align: middle;
 }
@@ -135,11 +139,11 @@ tbody:hover {
 }
 
 td.chance {
-    text-align: right;
+    text-align: left;
 }
 
 td.expected-attempts {
-    text-align: right;
+    text-align: center;
     padding-right: 1em !important;
 }
 

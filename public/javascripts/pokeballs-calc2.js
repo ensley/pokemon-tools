@@ -8,11 +8,14 @@ var pokeballApp = (function() {
 
     var $hp;
     var $hp_inner_bar;
+    var $originalContents;
 
     var initialize = function( options ) {
         if( options && typeof( options ) === 'object' ) {
             $.extend( config, options );
         }
+
+        $originalContents = $( '#results-container' ).html();
 
         $hp = $( '<div/>', {
             class: 'js-dynamic-hp-bar'
@@ -61,7 +64,7 @@ var pokeballApp = (function() {
 
     var submit_data = function( e ) {
         e.preventDefault();
-        $('#results-container').html( '' );
+        $('#results-container').html( $originalContents );
         $.ajax({
             type: 'POST',
             url: '/pokeballs',
@@ -75,6 +78,7 @@ var pokeballApp = (function() {
         console.log( data );
         var $container = $('#results-container');
         $container.css( 'display', '' );
+        $('#results-panel .panel-title').text( 'Results for ' + config.$wildPokeContainer.val() );
         data.ballProbs.map( function( ball ) {
             var ballElement = $('<tbody/>');
             if( typeof ball.cases === 'undefined' ) {
@@ -116,7 +120,7 @@ var pokeballApp = (function() {
             } else {
                 ball.cases.map( function( c, i ) {
                     var $blah = $('<tr/>', {
-                        class: 'inactive'
+                        class: c.isActive ? '' : 'inactive'
                     });
                     if( i === 0) {
                         $blah.append($('<th/>', {

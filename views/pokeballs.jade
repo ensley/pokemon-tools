@@ -24,17 +24,20 @@ block content
                         label(for='js-yourLevel') Your Pokemon level
                         input(type='number', class='form-control', id='js-yourLevel', name='yourLevel', min=1, max=100)
                     .form-group
+                        label(for='js-battleTurn') Battle turn
+                        input(type='number', class='form-control', id='js-battleTurn', name='battleTurn', min=1, value=1)
+                    .form-group
                         label(for='js-terrain') Terrain:
                         select(class='form-control', id='js-terrain', name='terrain')
                             option(value='land') On land
                             option(value='surfing') Surfing
                             option(value='fishing') Fishing
                     +checkbox('Wild Pokemon and your Pokemon are the same species and opposite genders', 'oppSex')
-                    +checkbox('Wild Pokemon is in your Pokedex', 'inDex')
+                    +checkbox('You have caught the wild Pokemon previously', 'inDex')
                     +checkbox('Nighttime or walking in a cave', 'nightOrCave')
                 button(type='submit', class=['btn', 'btn-default']) Go
         .col-md-8
-            +panel('Results', 'primary')
+            +panel('Results', 'primary', 'results-panel')
                 table(class='table', id='results-container')
                     thead
                         tr

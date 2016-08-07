@@ -41,9 +41,10 @@ mixin nav_header
 //- end navbar mixins
 
 //- Panel mixin
-mixin panel(heading, style)
+mixin panel(heading, style, id)
     - var style = (typeof style === 'undefined') ? 'default' : style
-    div(class=['panel', 'panel-' + style])
+    - var id = (typeof id === 'undefined') ? '' : id
+    div(class=['panel', 'panel-' + style], id=id)
         .panel-heading
             h3.panel-title= heading
         .panel-body

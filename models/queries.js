@@ -27,6 +27,7 @@ var pokeQueries = {
             .field("pspec.evolution_chain_id")
             .field("p.height")
             .field("p.weight")
+            .field("types.identifier", "type")
             .field("pspec.capture_rate")
             .field(
                 squel.select()
@@ -44,7 +45,9 @@ var pokeQueries = {
                     .where("pokemon_id = psn.pokemon_species_id"),
                 "base_speed"
             )
-            .from("pokemon_species", "pspec")
+            .from("pokemon_types", "pt")
+            .left_join("pokemon_species", "pspec", "pt.pokemon_id = pspec.id")
+            .join("types", null, "pt.type_id = types.id")
             .join("pokemon_species_names", "psn", "psn.pokemon_species_id = pspec.id")
             .join("pokemon", "p", "pspec.id = p.id")
             .where("psn.local_language_id = 9")

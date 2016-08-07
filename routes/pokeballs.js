@@ -56,17 +56,23 @@ var captureProb = (function() {
         var ballProbs = [];
 
         var query = pq.getCaptureStats( body.wildPoke );
-        db.get( query.text, {
+        console.log( query );
+        db.all( query.text, {
             $1: query.values[0]
-        }, function( err, row ) {
-            console.log( row );
+        }, function( err, rows ) {
+            console.log( rows );
+
+            var row = rows[0];
+            var types = [];
+            rows.map( function( row ) {
+                types.push( row.type );
+            } );
 
             balls.map( function( ball ) {
                 var ballObj = {};
                 var baseRate = row.capture_rate;
 
                 ballObj.name = toProperCase( ball );
-
 
                 if( ball === 'level-ball' ) {
                     var modRates = [ 1, 2, 4, 8 ].map( function( mult ) {
@@ -88,12 +94,31 @@ var captureProb = (function() {
                         ballObj.cases.push( caseObj );
                     } );
 
-                    [ 'Your level \x3C target level',
+                    [ 'Your level \u2264 target level',
                     'Target level \x3C your level \u2264 2 \xD7 target level',
                     '2 \xD7 target level \x3C your level \u2264 4 \xD7 target level',
                     '4 \xD7 target level \x3C your level' ].map( function( txt, i ) {
                         ballObj.cases[i].notes = txt;
                     } );
+
+                    body.wildLevel = parseInt( body.wildLevel );
+                    body.yourLevel = parseInt( body.yourLevel );
+
+                    if( isNaN(body.wildLevel) || isNaN(body.yourLevel) ) {
+                        console.log( 'levels not specified' );
+                        ballObj.cases.map( function( c ) {
+                            c.isActive = false;
+                        } );
+                    } else if( body.yourLevel <= body.wildLevel ) {
+                        console.log( 'your level less than wild level' );
+                        ballObj.cases[0].isActive = true;
+                    } else if( body.yourLevel <= 2 * body.wildLevel ) {
+                        ballObj.cases[1].isActive = true;
+                    } else if( body.yourLevel <= 4 * body.wildLevel ) {
+                        ballObj.cases[2].isActive = true;
+                    } else {
+                        ballObj.cases[3].isActive = true;
+                    }
 
                 } else if( ball === 'lure-ball') {
 
@@ -121,6 +146,12 @@ var captureProb = (function() {
                         ballObj.cases[i].notes = txt;
                     } );
 
+                    if( body.terrain === 'fishing' ) {
+                        ballObj.cases[0].isActive = true;
+                    } else {
+                        ballObj.cases[1].isActive = true;
+                    }
+
                 } else if( ball === 'love-ball' ) {
 
                     var modRates = [8, 1].map( function( mult ) {
@@ -146,6 +177,12 @@ var captureProb = (function() {
                     'Otherwise' ].map( function( txt, i ) {
                         ballObj.cases[i].notes = txt;
                     } );
+
+                    if( body.oppSex ) {
+                        ballObj.cases[0].isActive = true;
+                    } else {
+                        ballObj.cases[1].isActive = true;
+                    }
 
                 } else if( ball === 'heavy-ball' ) {
 
@@ -177,6 +214,16 @@ var captureProb = (function() {
                         ballObj.cases[i].notes = txt;
                     } );
 
+                    if( row.weight <= 204.8 ) {
+                        ballObj.cases[0].isActive = true;
+                    } else if( row.weight <= 307.2 ) {
+                        ballObj.cases[1].isActive = true;
+                    } else if( row.weight <= 409.6 ) {
+                        ballObj.cases[2].isActive = true;
+                    } else {
+                        ballObj.cases[3].isActive = true;
+                    }
+
                 } else if ( ball === 'fast-ball' ) {
 
                     var modRates = [4, 1].map( function( mult ) {
@@ -204,6 +251,12 @@ var captureProb = (function() {
                     ].map( function( txt, i ) {
                         ballObj.cases[i].notes = txt;
                     } );
+
+                    if( row.base_speed >= 100 ) {
+                        ballObj.cases[0].isActive = true;
+                    } else {
+                        ballObj.cases[1].isActive = true;
+                    }
 
                 } else if( ball === 'net-ball' ) {
 
@@ -233,6 +286,12 @@ var captureProb = (function() {
                         ballObj.cases[i].notes = txt;
                     } );
 
+                    if( types.indexOf( 'bug' ) !== -1 || types.indexOf( 'water' ) !== -1 ) {
+                        ballObj.cases[0].isActive = true;
+                    } else {
+                        ballObj.cases[1].isActive = true;
+                    }
+
                 } else if( ball === 'nest-ball' ) {
 
                     var level = body.wildLevel || 5;
@@ -246,6 +305,160 @@ var captureProb = (function() {
                     ballObj.shakes = shakeArray;
                     ballObj.notes = 'Better against lower-level targets. Worst at level 30+';
 
+                } else if( ball === 'repeat-ball' ) {
+
+                    var modRates = [3, 1].map( function( mult ) {
+                        return modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [
+                        'Target has been caught previously',
+                        'Otherwise'
+                    ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                    if( body.inDex ) {
+                        ballObj.cases[0].isActive = true;
+                    } else {
+                        ballObj.cases[1].isActive = true;
+                    }
+
+                } else if( ball === 'timer-ball' ) {
+
+                    var turn = body.battleTurn || 1;
+                    console.log( turn );
+
+                    var mult = Math.min((turn + 10)/10, 4);
+                    var modRate = modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+
+                    var shakeProb = shakeCheck( modRate );
+                    var shakeArray = calculateShakeArray( shakeProb );
+                    ballObj.shakes = shakeArray;
+                    ballObj.notes = 'Better in later turns. Caps at turn 30';
+
+
+                } else if( ball === 'dive-ball' ) {
+
+                    var modRates = [3.5, 1].map( function( mult ) {
+                        return modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [
+                        'Currently fishing or surfing',
+                        'Otherwise'
+                    ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                    if( body.terrain === 'surfing' || body.terrain === 'fishing' ) {
+                        ballObj.cases[0].isActive = true;
+                    } else {
+                        ballObj.cases[1].isActive = true;
+                    }
+
+                } else if( ball === 'dusk-ball' ) {
+
+                    var modRates = [3.5, 1].map( function( mult ) {
+                        return modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [
+                        'Currently nighttime or inside a cave',
+                        'Otherwise'
+                    ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                    if( body.nightOrCave ) {
+                        ballObj.cases[0].isActive = true;
+                    } else {
+                        ballObj.cases[1].isActive = true;
+                    }
+
+                } else if( ball === 'quick-ball' ) {
+
+                    var modRates = [4, 1].map( function( mult ) {
+                        return modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], mult );
+                    } );
+
+                    ballObj.cases = [];
+
+                    var shakeProbs = modRates.map( shakeCheck );
+
+                    shakeProbs.map( function( prob, i ) {
+                        var keyname = 'level' + i;
+                        var shakeArray = calculateShakeArray( prob );
+
+                        var caseObj = {};
+                        caseObj.shakes = shakeArray;
+
+
+                        ballObj.cases.push( caseObj );
+                    } );
+
+                    [
+                        'First turn of battle',
+                        'Otherwise'
+                    ].map( function( txt, i ) {
+                        ballObj.cases[i].notes = txt;
+                    } );
+
+                    if( parseInt(body.battleTurn) === 1) {
+                        ballObj.cases[0].isActive = true;
+                    } else {
+                        ballObj.cases[1].isActive = true;
+                    }
+
+                } else if( ball === 'master-ball' || ball === 'park-ball' || ball === 'dream-ball' ) {
+
+                    ballObj.shakes = [ 0, 0, 0, 0, 100 ];
+
                 } else {
                     var modRate = modifiedCatchRate( hpFrac, baseRate, statusBonuses[ status ], ballBonuses[ ball ]);
                     var shakeProb = shakeCheck( modRate );
@@ -256,7 +469,7 @@ var captureProb = (function() {
                 ballProbs.push( ballObj );
             } );
 
-            console.log(ballProbs);
+            // console.log(ballProbs);
 
             callback( ballProbs );
         });
