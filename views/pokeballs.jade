@@ -2,7 +2,7 @@ extends layout
 
 block content
     .row
-        .col-md-4
+        .col-md-5
             form(class='form', method='post')
                 +panel('Target Pokemon', 'primary')              
                     .form-group
@@ -36,7 +36,7 @@ block content
                     +checkbox('You have caught the wild Pokemon previously', 'inDex')
                     +checkbox('Nighttime or walking in a cave', 'nightOrCave')
                 button(type='submit', class=['btn', 'btn-default']) Go
-        .col-md-8
+        .col-md-7
             +panel('Results', 'primary', 'results-panel')
                 table(class='table', id='results-container')
                     thead

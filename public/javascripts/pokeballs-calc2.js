@@ -77,8 +77,7 @@ var pokeballApp = (function() {
     var write_results = function( data ) {
         console.log( data );
         var $container = $('#results-container');
-        $container.css( 'display', '' );
-        $('#results-panel .panel-title').text( 'Results for ' + config.$wildPokeContainer.val() );
+        $( '#results-panel' ).css( 'display', '' );
         data.ballProbs.map( function( ball ) {
             var ballElement = $('<tbody/>');
             if( typeof ball.cases === 'undefined' ) {
@@ -132,10 +131,10 @@ var pokeballApp = (function() {
                     $blah.append($('<td/>', {
                         class: 'chance'
                     })
-                            .append($('<div/>', {
-                                class: 'js-capture-rate-graph',
-                                title: 'Capture: ' + c.shakes[4].toFixed(1) + '%'
-                            })))
+                        .append($('<div/>', {
+                            class: 'js-capture-rate-graph',
+                            title: 'Capture: ' + c.shakes[4].toFixed(1) + '%'
+                        })))
                         .append($('<td/>', {
                             class: 'chance'
                         })
@@ -153,7 +152,7 @@ var pokeballApp = (function() {
                         $blah.find( '.js-capture-rate-graph' ).append(
                             $('<div/>', {
                                 class: 'js-capture-rate-graph-bar shake' + j,
-                                title: j + ' shakes: ' + c.shakes[4].toFixed(1) + '%',
+                                title: j + ' shakes: ' + c.shakes[j].toFixed(1) + '%',
                                 style: 'width: ' + c.shakes[j] + '%'
                             } )
                         );
@@ -184,6 +183,6 @@ var pokeballApp = (function() {
 })();
 
 $(function() {
-    $( '.table' ).css( 'display', 'none' );
+    $( '#results-panel' ).css( 'display', 'none' );
     pokeballApp.initialize();
 });
